@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Contract } from 'ethers';
+import { Contract, ContractFactory, parseUnits } from 'ethers';
+import MockERC20ABI from '../lib/MockERC20.json';
 import { useEthereum } from '../lib/ethereum';
 import { ESCROW_ADDRESS } from '../lib/contracts';
 import EscrowABI from '../lib/Escrow.json';
@@ -11,6 +12,10 @@ export default function AddToken() {
     const [allowedTokens, setAllowedTokens] = useState<string[]>([]);
     const [isOwner, setIsOwner] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [tokenName, setTokenName] = useState("");
+    const [tokenSymbol, setTokenSymbol] = useState("");
+    const [deploying, setDeploying] = useState(false);
+    const [lastDeployed, setLastDeployed] = useState<string | null>(null);
 
     useEffect(() => {
         if (provider) checkOwnerAndTokens();
@@ -61,6 +66,42 @@ export default function AddToken() {
         }
     };
 
+    const handleDeploy = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!signer) return;
+        const TEST_ACCOUNTS = [
+            "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+            "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+            "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        ];
+        try {
+            setDeploying(true);
+            const factory = new ContractFactory(MockERC20ABI.abi, (MockERC20ABI as any).bytecode, signer);
+            const newToken = await factory.deploy(tokenName, tokenSymbol);
+            await newToken.waitForDeployment();
+            const newTokenAddress = await newToken.getAddress();
+
+            for (const addr of TEST_ACCOUNTS) {
+                const tx = await (newToken as any).mint(addr, parseUnits("1000", 18));
+                await tx.wait();
+            }
+
+            const escrow = new Contract(ESCROW_ADDRESS, EscrowABI.abi, signer);
+            const txAdd = await escrow.addToken(newTokenAddress);
+            await txAdd.wait();
+
+            setLastDeployed(newTokenAddress);
+            setTokenName("");
+            setTokenSymbol("");
+            await checkOwnerAndTokens();
+        } catch (error: any) {
+            console.error(error);
+            alert("Deploy error: " + (error.reason || error.message));
+        } finally {
+            setDeploying(false);
+        }
+    };
+
     if (!isOwner) return null; // Admin only
 
     return (
@@ -87,6 +128,39 @@ export default function AddToken() {
                 </button>
             </form>
 
+            <div className="border-t border-white/5 pt-5 mb-6 relative z-10">
+                <h3 className="text-xs font-semibold text-white/40 mb-3 uppercase tracking-wider">Deploy New Test Token</h3>
+                <form onSubmit={handleDeploy} className="flex gap-2 flex-wrap">
+                    <input
+                        type="text"
+                        value={tokenName}
+                        onChange={e => setTokenName(e.target.value)}
+                        placeholder="Token Name (e.g. Token C)"
+                        className="flex-1 min-w-[140px] bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-white/90 outline-none focus:border-violet-500 transition-colors text-sm"
+                        required
+                    />
+                    <input
+                        type="text"
+                        value={tokenSymbol}
+                        onChange={e => setTokenSymbol(e.target.value)}
+                        placeholder="Symbol (e.g. TKC)"
+                        className="w-32 bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-white/90 outline-none focus:border-violet-500 transition-colors text-sm"
+                        required
+                    />
+                    <button
+                        disabled={deploying}
+                        className="px-5 py-2 rounded-xl bg-violet-500/20 hover:bg-violet-500/40 text-violet-300 font-semibold border border-violet-500/40 transition-all disabled:opacity-50 text-sm"
+                    >
+                        {deploying ? "Deploying..." : "Deploy & Register"}
+                    </button>
+                </form>
+                {lastDeployed && (
+                    <div className="mt-2 text-[10px] font-mono text-violet-300/70">
+                        Deployed: {lastDeployed}
+                    </div>
+                )}
+            </div>
+
             <div className="relative z-10">
                 <h3 className="text-xs font-semibold text-white/40 mb-3 uppercase tracking-wider">Approved Registry</h3>
                 {allowedTokens.length === 0 ? (
@@ -95,8 +169,11 @@ export default function AddToken() {
                     <div className="flex flex-col gap-2">
                         {allowedTokens.map((token, idx) => (
                             <div key={idx} className="flex items-center gap-3 bg-white/5 px-4 py-2.5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
-                                <div className="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]"></div>
-                                <span className="font-mono text-sm text-blue-100">{token}</span>
+                                <div className="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)] shrink-0"></div>
+                                <div>
+                                    <div className="text-xs font-bold text-blue-300 tracking-wide">TOKEN {String.fromCharCode(65 + idx)}</div>
+                                    <div className="font-mono text-[10px] text-white/40 mt-0.5">{token}</div>
+                                </div>
                             </div>
                         ))}
                     </div>
