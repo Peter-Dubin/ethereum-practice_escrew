@@ -1,0 +1,90 @@
+Warning: optimizer settings and `viaIR` have been disabled for accurate coverage reports.
+If you encounter "stack too deep" errors, consider using `--ir-minimum` which enables `viaIR` with minimum optimization resolving most of the errors
+Compiling 41 files with Solc 0.8.33
+Solc 0.8.33 finished in 1.84s
+Compiler run successful with warnings:
+Warning (2018): Function state mutability can be restricted to view
+   --> test/Escrow.t.sol:121:5:
+    |
+121 |     function test_AddToken_UpdatesMappingAndList() public {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Analysing contracts...
+Running tests...
+
+Ran 2 tests for test/Counter.t.sol:CounterTest
+[PASS] testFuzz_SetNumber(uint256) (runs: 256, μ: 28511, ~: 29289)
+[PASS] test_Increment() (gas: 28783)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 28.47ms (23.32ms CPU time)
+
+Ran 11 tests for test/EscrowIntegration.t.sol:EscrowIntegrationTest
+[PASS] test_Integration_AllStatuses_InOneSession() (gas: 643504)
+[PASS] test_Integration_CancelAndComplete_Mixed() (gas: 640711)
+[PASS] test_Integration_FullSwapWorkflow() (gas: 301318)
+[PASS] test_Integration_LargeAmounts() (gas: 299614)
+[PASS] test_Integration_MinimumAmounts_OneWei() (gas: 300378)
+[PASS] test_Integration_MultipleCreators_IndependentOps() (gas: 514903)
+[PASS] test_Integration_MultipleOps_OneCompleted() (gas: 615032)
+[PASS] test_Integration_OwnerAddsTokenMidSession() (gas: 1316289)
+[PASS] test_Integration_OwnerCanComplete_IfNotCreator() (gas: 302523)
+[PASS] test_Integration_SequentialIds_AfterMixedOps() (gas: 642503)
+[PASS] test_Integration_UserSwapsBothDirections() (gas: 512919)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 120.85ms (45.90ms CPU time)
+
+Ran 37 tests for test/Escrow.t.sol:EscrowTest
+[PASS] test_AddToken() (gas: 901660)
+[PASS] test_AddToken_AlreadyAllowed_Revert() (gas: 18642)
+[PASS] test_AddToken_EmitsTokenAdded() (gas: 895075)
+[PASS] test_AddToken_OnlyOwner_Revert() (gas: 842426)
+[PASS] test_AddToken_UpdatesMappingAndList() (gas: 30799)
+[PASS] test_AddToken_ZeroAddress_Revert() (gas: 14241)
+[PASS] test_CancelOperation() (gas: 222176)
+[PASS] test_CancelOperation_EmitsOperationCancelled() (gas: 214007)
+[PASS] test_CancelOperation_InvalidId_Revert() (gas: 19427)
+[PASS] test_CancelOperation_NotActive_WhenCancelled_Revert() (gas: 218049)
+[PASS] test_CancelOperation_NotActive_WhenClosed_Revert() (gas: 288356)
+[PASS] test_CancelOperation_NotCreator_Revert() (gas: 215093)
+[PASS] test_CancelOperation_RefundsTokenA() (gas: 215847)
+[PASS] test_CancelOperation_StatusIsCancelled() (gas: 218396)
+[PASS] test_CompleteOperation() (gas: 293665)
+[PASS] test_CompleteOperation_CorrectBalancesAfterSwap() (gas: 291267)
+[PASS] test_CompleteOperation_CreatorCannotComplete_Revert() (gas: 272697)
+[PASS] test_CompleteOperation_EmitsOperationCompleted() (gas: 284238)
+[PASS] test_CompleteOperation_InvalidId_Revert() (gas: 19448)
+[PASS] test_CompleteOperation_NotActive_WhenCancelled_Revert() (gas: 250083)
+[PASS] test_CompleteOperation_NotActive_WhenClosed_Revert() (gas: 312090)
+[PASS] test_CompleteOperation_StatusIsClosed() (gas: 288019)
+[PASS] test_CompleteOperation_WithoutApproval_Revert() (gas: 241795)
+[PASS] test_CreateOperation() (gas: 217475)
+[PASS] test_CreateOperation_AmountA_Zero_Revert() (gas: 56651)
+[PASS] test_CreateOperation_AmountB_Zero_Revert() (gas: 56650)
+[PASS] test_CreateOperation_EmitsOperationCreated() (gas: 210865)
+[PASS] test_CreateOperation_SameTokenBothSides() (gas: 215533)
+[PASS] test_CreateOperation_SequentialIds() (gas: 385031)
+[PASS] test_CreateOperation_TokenA_NotAllowed_Revert() (gas: 926187)
+[PASS] test_CreateOperation_TokenB_NotAllowed_Revert() (gas: 882926)
+[PASS] test_CreateOperation_WithoutApproval_Revert() (gas: 171289)
+[PASS] test_Fuzz_AddToken_NonOwner(address) (runs: 256, μ: 843259, ~: 843259)
+[PASS] test_Fuzz_CreateOperation_AmountA(uint256) (runs: 256, μ: 219489, ~: 219489)
+[PASS] test_GetAllOperations_ReturnsAllStatuses() (gas: 651004)
+[PASS] test_GetAllOperations_ReturnsEmpty_Initially() (gas: 1651367)
+[PASS] test_GetAllowedTokens_ReturnsEmpty_Initially() (gas: 1651463)
+Suite result: ok. 37 passed; 0 failed; 0 skipped; finished in 121.18ms (255.53ms CPU time)
+
+Ran 3 test suites in 126.82ms (270.49ms CPU time): 50 tests passed, 0 failed, 0 skipped (50 total tests)
+
+╭----------------------+-----------------+-----------------+-----------------+---------------╮
+| File                 | % Lines         | % Statements    | % Branches      | % Funcs       |
++============================================================================================+
+| script/Counter.s.sol | 0.00% (0/5)     | 0.00% (0/3)     | 100.00% (0/0)   | 0.00% (0/2)   |
+|----------------------+-----------------+-----------------+-----------------+---------------|
+| script/Deploy.s.sol  | 0.00% (0/16)    | 0.00% (0/21)    | 100.00% (0/0)   | 0.00% (0/1)   |
+|----------------------+-----------------+-----------------+-----------------+---------------|
+| src/Counter.sol      | 100.00% (4/4)   | 100.00% (2/2)   | 100.00% (0/0)   | 100.00% (2/2) |
+|----------------------+-----------------+-----------------+-----------------+---------------|
+| src/Escrow.sol       | 100.00% (36/36) | 100.00% (30/30) | 100.00% (24/24) | 100.00% (6/6) |
+|----------------------+-----------------+-----------------+-----------------+---------------|
+| src/MockERC20.sol    | 100.00% (2/2)   | 100.00% (1/1)   | 100.00% (0/0)   | 100.00% (1/1) |
+|----------------------+-----------------+-----------------+-----------------+---------------|
+| Total                | 66.67% (42/63)  | 57.89% (33/57)  | 100.00% (24/24) | 75.00% (9/12) |
+╰----------------------+-----------------+-----------------+-----------------+---------------╯
