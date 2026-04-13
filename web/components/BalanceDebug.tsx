@@ -52,7 +52,6 @@ export default function BalanceDebug() {
                     }
                 })
             );
-            setTokens(tokenInfos);
 
             const newBalances: Record<string, { eth: string; [k: string]: string }> = {};
             for (const acc of ACCOUNTS) {
@@ -75,6 +74,7 @@ export default function BalanceDebug() {
                 }
                 newBalances[acc.addr] = entry;
             }
+            setTokens(tokenInfos);
             setBalances(newBalances);
         } catch (e) {
             console.error(e);

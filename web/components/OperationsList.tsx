@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Contract, formatUnits } from 'ethers';
 import { useEthereum } from '../lib/ethereum';
 import { ESCROW_ADDRESS } from '../lib/contracts';
@@ -17,6 +17,7 @@ export default function OperationsList() {
     const [operations, setOperations] = useState<any[]>([]);
     const [loadingIds, setLoadingIds] = useState<Record<string, boolean>>({});
     const [tokenLabels, setTokenLabels] = useState<Record<string, string>>({});
+    const fetchingRef = useRef(false);
 
     useEffect(() => {
         if (provider) fetchOps();
@@ -25,20 +26,24 @@ export default function OperationsList() {
     }, [provider, account]);
 
     const fetchOps = async () => {
+        if (fetchingRef.current) return;
+        fetchingRef.current = true;
         try {
             const escrow = new Contract(ESCROW_ADDRESS, EscrowABI.abi, provider);
             const [ops, tokens] = await Promise.all([
                 escrow.getAllOperations(),
                 escrow.getAllowedTokens(),
             ]);
-            setOperations(ops || []);
             const labels: Record<string, string> = {};
             (tokens || []).forEach((t: string, i: number) => {
                 labels[t.toLowerCase()] = `TOKEN ${String.fromCharCode(65 + i)}`;
             });
+            setOperations(ops || []);
             setTokenLabels(labels);
         } catch (err) {
             console.error(err);
+        } finally {
+            fetchingRef.current = false;
         }
     };
 
@@ -95,7 +100,7 @@ export default function OperationsList() {
                 {operations.length === 0 ? (
                     <p className="text-white/30 text-center py-10 italic">No available operations.</p>
                 ) : (
-                    operations.map((op, idx) => {
+                    operations.map((op) => {
                         const isActive = op.status.toString() === "0";
                         const isCreator = op.creator.toLowerCase() === account.toLowerCase();
                         
@@ -105,7 +110,7 @@ export default function OperationsList() {
                         if (op.status.toString() === "2") { statusColor = "bg-red-500/20 text-red-400 border-red-500/30"; statusText = "CANCELLED"; }
 
                         return (
-                            <div key={idx} className="bg-black/30 border border-white/5 rounded-2xl p-5 relative overflow-hidden transition-all hover:bg-black/40">
+                            <div key={op.id.toString()} className="bg-black/30 border border-white/5 rounded-2xl p-5 relative overflow-hidden transition-all hover:bg-black/40">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex items-center gap-2">
                                         <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 font-bold text-xs border border-white/10">#{op.id.toString()}</div>
